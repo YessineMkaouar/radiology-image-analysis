@@ -48,6 +48,24 @@ def analyze_radiology_image(image, clinical_info, patient_name="", birth_date=""
         3. Redémarrez l'application
         """
     
+    # Test de connexion API (optionnel mais recommandé)
+    try:
+        api_test_success, api_test_message = analyzer.test_api_connection()
+        if not api_test_success:
+            return f"""
+            ❌ **Problème de connexion API**
+            
+            {api_test_message}
+            
+            **Vérifications suggérées :**
+            • Clé API valide et active
+            • Quota API disponible
+            • Connexion internet stable
+            """
+    except Exception as e:
+        # Continue même si le test échoue (pour éviter de bloquer l'analyse)
+        pass
+    
     # Vérifier que l'image est fournie
     if image is None:
         return "❌ **Veuillez uploader une image radiologique**"
@@ -57,11 +75,22 @@ def analyze_radiology_image(image, clinical_info, patient_name="", birth_date=""
         return "❌ **Veuillez fournir les renseignements cliniques**"
     
     try:
-        # Convertir l'image si nécessaire
+        # Convertir l'image si nécessaire - Gradio fournit directement une PIL Image
         if isinstance(image, str):
+            # Si c'est un chemin de fichier
             pil_image = Image.open(image)
+        elif hasattr(image, 'shape'):
+            # Si c'est un array numpy
+            pil_image = Image.fromarray(image)
+        elif isinstance(image, Image.Image):
+            # Si c'est déjà une PIL Image (cas normal avec Gradio)
+            pil_image = image
         else:
-            pil_image = Image.fromarray(image) if hasattr(image, 'shape') else image
+            return "❌ **Format d'image non reconnu**"
+        
+        # Assurer que l'image est en mode RGB pour Gemini
+        if pil_image.mode not in ['RGB', 'RGBA']:
+            pil_image = pil_image.convert('RGB')
         
         # Valider l'image
         is_valid, message = analyzer.validate_image(pil_image)
@@ -124,19 +153,8 @@ def create_demo():
         gr.HTML("""
         <div class="medical-header">
             <h1>🏥 Assistant d'Analyse Radiologique IA</h1>
-            <h3>Analyse automatisée d'images médicales avec Gemini 2.5 Pro</h3>
+            <h3>Analyse automatisée d'images médicales</h3>
             <p>Radiographies • Mammographies • Scanners 2D • IRM</p>
-        </div>
-        """)
-        
-        # Information importante
-        gr.HTML("""
-        <div class="medical-info">
-            <h4>⚠️ AVERTISSEMENT MÉDICAL IMPORTANT</h4>
-            <p><strong>Cet outil est destiné à des fins éducatives et d'assistance uniquement.</strong></p>
-            <p>• Les résultats ne remplacent PAS un diagnostic médical professionnel</p>
-            <p>• Toujours consulter un radiologue qualifié pour un diagnostic définitif</p>
-            <p>• Ne pas utiliser pour des décisions médicales critiques</p>
         </div>
         """)
         
@@ -264,12 +282,4 @@ if __name__ == "__main__":
     demo = create_demo()
     
     # Configuration du lancement
-    demo.launch(
-        server_name="0.0.0.0",  # Permettre l'accès externe
-        server_port=7860,       # Port par défaut Gradio
-        share=False,            # Ne pas créer de lien public automatiquement
-        debug=True,             # Mode debug pour le développement
-        show_error=True,        # Afficher les erreurs détaillées
-        favicon_path=None,      # Pas d'icône personnalisée
-        ssl_verify=False        # Désactiver la vérification SSL en dev
-    )
+    demo.launch()

@@ -21,7 +21,7 @@ class RadiologyAnalyzer:
             api_key: Clé API Google Gemini
         """
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.model = genai.GenerativeModel('gemini-2.5-pro')
         
     def create_analysis_prompt(self, clinical_info: str, patient_name: str = "", 
                              birth_date: str = "", doctor_name: str = "") -> str:
@@ -103,7 +103,7 @@ Maintenant, applique cette méthodologie rigoureuse pour générer le rapport de
         Returns:
             Image prétraitée
         """
-        # Convertir en niveaux de gris si nécessaire pour les images radiologiques
+        # Convertir en RGB (requis par Gemini)
         if image.mode != 'RGB':
             image = image.convert('RGB')
             
@@ -112,6 +112,13 @@ Maintenant, applique cette méthodologie rigoureuse pour générer le rapport de
         if max(image.size) > max_size:
             ratio = max_size / max(image.size)
             new_size = tuple(int(dim * ratio) for dim in image.size)
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+        
+        # Vérifier la taille minimale pour Gemini
+        min_size = 32
+        if min(image.size) < min_size:
+            # Redimensionner vers la taille minimale
+            new_size = (max(min_size, image.width), max(min_size, image.height))
             image = image.resize(new_size, Image.Resampling.LANCZOS)
             
         return image
@@ -141,13 +148,66 @@ Maintenant, applique cette méthodologie rigoureuse pour générer le rapport de
                 clinical_info, patient_name, birth_date, doctor_name
             )
             
-            # Générer l'analyse avec Gemini
-            response = self.model.generate_content([prompt, processed_image])
+            # Configuration de sécurité pour les images médicales
+            safety_settings = [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            ]
             
-            return response.text
+            # Générer l'analyse avec Gemini
+            response = self.model.generate_content(
+                [prompt, processed_image],
+                safety_settings=safety_settings
+            )
+            
+            # Vérifier si la réponse est valide
+            if response.candidates and len(response.candidates) > 0:
+                candidate = response.candidates[0]
+                
+                # Vérifier le statut de fin
+                if hasattr(candidate, 'finish_reason'):
+                    finish_reason = candidate.finish_reason
+                    if finish_reason == 1:  # STOP - normal
+                        pass
+                    elif finish_reason == 2:  # MAX_TOKENS
+                        return "⚠️ Réponse tronquée : Le rapport est trop long. Veuillez essayer avec des renseignements cliniques plus concis."
+                    elif finish_reason == 3:  # SAFETY
+                        return "⚠️ Contenu bloqué pour des raisons de sécurité. Veuillez vérifier que l'image est appropriée pour l'analyse médicale."
+                    elif finish_reason == 4:  # RECITATION
+                        return "⚠️ Contenu bloqué pour récitation. Veuillez essayer avec une image différente."
+                    else:
+                        return f"⚠️ Génération arrêtée (raison: {finish_reason}). Veuillez réessayer."
+                
+                # Extraire le texte
+                if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                    text_parts = []
+                    for part in candidate.content.parts:
+                        if hasattr(part, 'text') and part.text:
+                            text_parts.append(part.text)
+                    
+                    if text_parts:
+                        return '\n'.join(text_parts)
+                    else:
+                        return "❌ Aucun contenu textuel généré. Veuillez réessayer avec une image différente."
+                else:
+                    return "❌ Structure de réponse inattendue. Veuillez réessayer."
+            else:
+                return "❌ Aucune réponse générée. Veuillez vérifier votre clé API et réessayer."
             
         except Exception as e:
-            return f"Erreur lors de l'analyse : {str(e)}"
+            error_msg = str(e)
+            if "finish_reason" in error_msg:
+                return f"⚠️ Génération interrompue par Gemini. Cela peut être dû à:\n• Image trop complexe ou peu claire\n• Contenu considéré comme sensible\n• Problème temporaire du service\n\nDétails: {error_msg}"
+            elif "INVALID_ARGUMENT" in error_msg:
+                return "❌ Image invalide ou format non supporté par Gemini. Veuillez essayer avec une image JPEG ou PNG."
+            elif "PERMISSION_DENIED" in error_msg:
+                return "❌ Problème d'authentification. Vérifiez votre clé API Gemini."
+            elif "QUOTA_EXCEEDED" in error_msg:
+                return "⚠️ Quota API dépassé. Veuillez attendre ou vérifier votre plan Gemini."
+            else:
+                return f"❌ Erreur lors de l'analyse: {error_msg}"
     
     def validate_image(self, image: Image.Image) -> Tuple[bool, str]:
         """
@@ -166,11 +226,37 @@ Maintenant, applique cette méthodologie rigoureuse pour générer le rapport de
         if min(image.size) < 100:
             return False, "Image trop petite pour l'analyse"
             
-        # Vérifier le format
-        if image.format not in ['JPEG', 'PNG', 'TIFF', 'BMP', 'DICOM']:
-            return False, "Format d'image non supporté"
+        # Vérifier le format - être plus permissif pour les images Gradio
+        # Si le format est None (cas fréquent avec Gradio), on accepte l'image
+        if image.format is not None:
+            supported_formats = ['JPEG', 'PNG', 'TIFF', 'BMP', 'DICOM']
+            if image.format not in supported_formats:
+                return False, f"Format d'image non supporté: {image.format}"
+        
+        # Vérification additionnelle : l'image doit avoir des canaux de couleur valides
+        if not hasattr(image, 'mode') or image.mode not in ['RGB', 'RGBA', 'L', 'P']:
+            return False, "Mode d'image non supporté"
             
         return True, "Image valide"
+    
+    def test_api_connection(self) -> Tuple[bool, str]:
+        """
+        Teste la connexion à l'API Gemini
+        
+        Returns:
+            Tuple (succès, message)
+        """
+        try:
+            # Test simple avec du texte
+            test_response = self.model.generate_content("Répondez simplement 'OK' si vous recevez ce message.")
+            
+            if test_response.candidates and len(test_response.candidates) > 0:
+                return True, "✅ Connexion API Gemini réussie"
+            else:
+                return False, "❌ Pas de réponse de l'API Gemini"
+                
+        except Exception as e:
+            return False, f"❌ Erreur de connexion API: {str(e)}"
 
 
 def load_analyzer() -> Optional[RadiologyAnalyzer]:
