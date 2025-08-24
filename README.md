@@ -1,201 +1,203 @@
-# Assistant d'Analyse Radiologique IA / AI Radiology Analysis Assistant
 
-> 🇫🇷 **Version française** | 🇬🇧 **[English version](README_EN.md)**
+# AI Radiology Analysis Assistant / Assistant d'Analyse Radiologique IA
 
-Un assistant intelligent pour l'analyse d'images radiologiques utilisant Gemini 2.5 Pro et une interface Gradio moderne.
+> An intelligent assistant for radiological image analysis using Gemini 2.5 Pro and a modern Gradio interface.
 
-*An intelligent assistant for radiological image analysis using Gemini 2.5 Pro and a modern Gradio interface.*
+*Un assistant intelligent pour l'analyse d'images radiologiques utilisant Gemini 2.5 Pro et une interface Gradio moderne.*
 
-## 🎯 Fonctionnalités
+## 🎯 Features
 
-- **Analyse automatisée** d'images radiologiques (rayons X, mammographies, scanners 2D)
-- **Interface utilisateur intuitive** développée avec Gradio
-- **Rapports structurés** en français suivant les standards médicaux
-- **Support multi-formats** : JPEG, PNG, TIFF, BMP, DICOM
-- **Corrélation clinico-radiologique** avancée
+- **Automated analysis** of radiological images (X-rays, mammograms, 2D scans)
+- **Intuitive user interface** developed with Gradio
+- **Structured reports** in French following medical standards
+- **Multi-format support**: JPEG, PNG, TIFF, BMP, DICOM
+- **Advanced clinico-radiological correlation**
 
-## ⚠️ Avertissement Médical
+## ⚠️ Medical Disclaimer
 
-**Cet outil est destiné à des fins éducatives et d'assistance uniquement.**
+**This tool is intended for educational and assistance purposes only.**
 
-- Les résultats ne remplacent PAS un diagnostic médical professionnel
-- Toujours consulter un radiologue qualifié pour un diagnostic définitif
-- Ne pas utiliser pour des décisions médicales critiques
+- Results do NOT replace professional medical diagnosis
+- Always consult a qualified radiologist for definitive diagnosis
+- Do not use for critical medical decisions
 
-## 🚀 Installation Rapide
+## 🚀 Quick Installation
 
-### Prérequis
+### Prerequisites
 
-- Python 3.8 ou supérieur
-- Clé API Google Gemini ([Obtenir ici](https://makersuite.google.com/app/apikey))
+- Python 3.8 or higher
+- Google Gemini API Key ([Get here](https://makersuite.google.com/app/apikey))
 
 ### Installation
 
-1. **Cloner ou télécharger le projet**
+1. **Clone or download the project**
+
    ```bash
    git clone <repository-url>
    cd radiology-image-analysis
    ```
+2. **Run the startup script**
 
-2. **Exécuter le script de démarrage**
    ```bash
    python start.py
    ```
 
-   Le script va automatiquement :
-   - Vérifier la version Python
-   - Installer toutes les dépendances
-   - Créer le fichier de configuration
-   - Lancer l'application
+   The script will automatically:
 
-3. **Configurer la clé API**
-   - Ouvrez le fichier `.env` créé
-   - Remplacez `your_gemini_api_key_here` par votre vraie clé API Gemini
-   - Redémarrez l'application
+   - Check Python version
+   - Install all dependencies
+   - Create configuration file
+   - Launch the application
+3. **Configure API key**
 
-4. **Accéder à l'interface**
-   - Ouvrez votre navigateur sur : http://localhost:7860
+   - Open the created `.env` file
+   - Replace `your_gemini_api_key_here` with your actual Gemini API key
+   - Restart the application
+4. **Access the interface**
 
-## 🛠️ Installation Manuelle
+   - Open your browser to: http://localhost:7860
 
-Si vous préférez installer manuellement :
+## 🛠️ Manual Installation
+
+If you prefer manual installation:
 
 ```bash
-# Installer les dépendances
+# Install dependencies
 pip install -r requirements.txt
 
-# Configurer les variables d'environnement
+# Configure environment variables
 cp .env.example .env
-# Éditer .env avec votre clé API
+# Edit .env with your API key
 
-# Lancer l'application
+# Launch application
 python app.py
 ```
 
-## 📋 Utilisation
+## 📋 Usage
 
-### 1. Interface Web
+### 1. Web Interface
 
-1. **Uploadez une image radiologique** (formats supportés : JPEG, PNG, TIFF, BMP, DICOM)
-2. **Saisissez les renseignements cliniques** (obligatoire)
-3. **Complétez les informations patient** (optionnel)
-4. **Cliquez sur "Analyser l'Image Radiologique"**
-5. **Consultez le rapport généré**
+1. **Upload a radiological image** (supported formats: JPEG, PNG, TIFF, BMP, DICOM)
+2. **Enter clinical information** (required)
+3. **Complete patient information** (optional)
+4. **Click "Analyze Radiological Image"**
+5. **Review the generated report**
 
-### 2. Structure du Rapport
+### 2. Report Structure
 
-Le rapport généré suit une structure médicale standardisée :
+The generated report follows a standardized medical structure:
 
-- **En-tête** : Informations patient et examen
-- **Renseignements cliniques** : Contexte médical fourni
-- **Description analytique** : Observation objective des signes radiologiques
-- **Synthèse et diagnostic différentiel** : Corrélation clinico-radiologique
-- **Impression/Conclusion** : Diagnostic probable et recommandations
+- **Header**: Patient and examination information
+- **Clinical information**: Provided medical context
+- **Analytical description**: Objective observation of radiological signs
+- **Synthesis and differential diagnosis**: Clinico-radiological correlation
+- **Impression/Conclusion**: Probable diagnosis and recommendations
 
-### 3. Exemples de Renseignements Cliniques
-
-```
-Patient de 53 ans, fumeur, adressé pour majoration d'une névralgie 
-cervicobrachiale C8-T1. Présente une douleur du membre supérieur 
-gauche et une légère atrophie musculaire de l'épaule.
-```
+### 3. Clinical Information Examples
 
 ```
-Patiente de 45 ans, non-fumeuse, consulte pour une toux persistante 
-depuis 3 semaines avec légère dyspnée d'effort. Antécédents familiaux 
-de cancer pulmonaire.
+53-year-old male patient, smoker, referred for worsening C8-T1 
+cervicobrachial neuralgia. Presents with left upper limb pain and 
+slight muscular atrophy of the shoulder.
 ```
 
-## 🔧 Configuration Avancée
+```
+45-year-old female patient, non-smoker, consulting for persistent 
+cough for 3 weeks with mild exertional dyspnea. Family history 
+of lung cancer.
+```
 
-### Variables d'Environnement
+## 🔧 Advanced Configuration
 
-Fichier `.env` :
+### Environment Variables
+
+`.env` file:
+
 ```
 GOOGLE_API_KEY=your_actual_gemini_api_key
 ```
 
-### Personnalisation du Prompt
+### Prompt Customization
 
-Le prompt d'analyse peut être personnalisé dans `radiology_analyzer.py` dans la méthode `create_analysis_prompt()`.
+The analysis prompt can be customized in `radiology_analyzer.py` in the `create_analysis_prompt()` method.
 
-## 📁 Structure du Projet
+## 📁 Project Structure
 
 ```
 radiology-image-analysis/
-├── app.py                 # Application Gradio principale
-├── radiology_analyzer.py  # Moteur d'analyse avec Gemini
-├── start.py              # Script de démarrage automatique
-├── requirements.txt      # Dépendances Python
-├── .env                  # Configuration (créé automatiquement)
+├── app.py                 # Main Gradio application
+├── radiology_analyzer.py  # Gemini analysis engine
+├── start.py              # Automatic startup script
+├── requirements.txt      # Python dependencies
+├── .env                  # Configuration (created automatically)
 ├── README.md            # Documentation
-└── examples/            # Images d'exemple (optionnel)
+└── examples/            # Example images (optional)
 ```
 
-## 🐛 Résolution de Problèmes
+## 🐛 Troubleshooting
 
-### Erreur : "Import could not be resolved"
+### Error: "Import could not be resolved"
 
-C'est normal avant l'installation des dépendances. Exécutez `python start.py` pour installer automatiquement tous les packages requis.
+This is normal before dependency installation. Run `python start.py` to automatically install all required packages.
 
-### Erreur : "Clé API non configurée"
+### Error: "API key not configured"
 
-1. Vérifiez que le fichier `.env` existe
-2. Assurez-vous que votre clé API Gemini est correctement configurée
-3. Redémarrez l'application
+1. Check that the `.env` file exists
+2. Ensure your Gemini API key is correctly configured
+3. Restart the application
 
-### Erreur : "Image invalide"
+### Error: "Invalid image"
 
-- Vérifiez que le format d'image est supporté (JPEG, PNG, TIFF, BMP, DICOM)
-- Assurez-vous que l'image n'est pas corrompue
-- Vérifiez que la taille de l'image est suffisante (minimum 100x100 pixels)
+- Check that the image format is supported (JPEG, PNG, TIFF, BMP, DICOM)
+- Ensure the image is not corrupted
+- Check that the image size is sufficient (minimum 100x100 pixels)
 
-### Problèmes de Performance
+### Performance Issues
 
-- Utilisez des images de résolution raisonnable (max 1024x1024)
-- Vérifiez votre connexion internet pour les appels API
-- Les images DICOM peuvent prendre plus de temps à traiter
+- Use reasonable resolution images (max 1024x1024)
+- Check your internet connection for API calls
+- DICOM images may take longer to process
 
-## 🔐 Sécurité et Confidentialité
+## 🔐 Security and Privacy
 
-- **Données locales** : Les images sont traitées localement avant envoi à l'API
-- **Pas de stockage** : Aucune image n'est sauvegardée sur nos serveurs
-- **API Gemini** : Les données transitent par les serveurs Google selon leurs conditions
-- **Responsabilité** : L'utilisateur est responsable de la conformité RGPD/HIPAA
+- **Local data**: Images are processed locally before sending to API
+- **No storage**: No images are saved on our servers
+- **Gemini API**: Data transits through Google servers according to their terms
+- **Responsibility**: User is responsible for GDPR/HIPAA compliance
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! Veuillez :
+Contributions are welcome! Please:
 
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité
-3. Commiter vos changements
-4. Pousser vers la branche
-5. Ouvrir une Pull Request
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+This project is under MIT license. See the `LICENSE` file for more details.
 
 ## 🆘 Support
 
-Pour obtenir de l'aide :
+For help:
 
-1. Consultez cette documentation
-2. Vérifiez les [Issues GitHub](issues)
-3. Créez une nouvelle issue si nécessaire
+1. Consult this documentation
+2. Check [GitHub Issues](issues)
+3. Create a new issue if necessary
 
 ## 🔮 Roadmap
 
-- [ ] Support des images DICOM avancé
-- [ ] Intégration de modèles spécialisés par type d'examen
-- [ ] Export PDF des rapports
-- [ ] API REST pour intégration
-- [ ] Mode batch pour traitement de plusieurs images
-- [ ] Support multilingue (anglais, espagnol)
+- [ ] Advanced DICOM image support
+- [ ] Integration of specialized models by examination type
+- [ ] PDF report export
+- [ ] REST API for integration
+- [ ] Batch mode for processing multiple images
+- [ ] Multilingual support (English, Spanish)
 
 ---
 
-**Développé avec ❤️ pour la communauté médicale**
+**Developed with ❤️ for the medical community**
 
-*Dernière mise à jour : Août 2025*
+*Last updated: August 2025*
