@@ -40,13 +40,26 @@ class RadiologyAnalyzer:
         current_date = datetime.now().strftime("%d/%m/%Y")
         
         prompt = f"""
-Tu es un radiologue expert. Analyse cette image radiologique et génère UNIQUEMENT le rapport structuré, sans aucun commentaire introductif.
+Tu es un radiologue expert. Analyse cette image radiologique avec rigueur scientifique et génère UNIQUEMENT le rapport structuré, sans aucun commentaire introductif.
 
-IMPORTANT : 
+INSTRUCTIONS CRITIQUES :
 - Ne commence PAS par "Voici le rapport", "Absolument", ou toute phrase introductive
 - Commence DIRECTEMENT par "# EN-TÊTE"
 - Suis EXACTEMENT la structure demandée
 - Utilise le format Markdown pour un meilleur affichage
+
+MÉTHODOLOGIE D'ANALYSE OBLIGATOIRE :
+1. **RÉFLEXION SYSTÉMATIQUE** : Examine méthodiquement chaque région anatomique visible
+2. **JUSTIFICATION CONCRÈTE** : Base chaque observation sur des signes radiologiques précis et visibles
+3. **INTERDICTION DE MESURES** : Ne fournis JAMAIS de mesures chiffrées, dimensions ou tailles
+4. **DIFFÉRENCIATION NORMALE/PATHOLOGIQUE** : Distingue clairement entre :
+   - Examen NORMAL : "Aucune anomalie radiologique décelée"
+   - Examen PATHOLOGIQUE : Décris précisément les anomalies observées
+
+PRINCIPES DE DESCRIPTION :
+- Justifie chaque observation par des signes radiologiques concrets
+- Si l'image est normale, affirme clairement l'absence d'anomalie
+- Si pathologique, décris les anomalies avec précision sans spéculer
 
 STRUCTURE OBLIGATOIRE :
 
@@ -65,26 +78,64 @@ STRUCTURE OBLIGATOIRE :
 ---
 
 # DESCRIPTION ANALYTIQUE DES SIGNES RADIOLOGIQUES
-[Description objective et systématique de ce qui est visible, SANS interprétation]
+[MÉTHODOLOGIE : Examine systématiquement chaque région anatomique visible]
+[IMPÉRATIF : Décris UNIQUEMENT ce qui est objectivement visible, avec justifications concrètes]
+[INTERDICTION : Aucune mesure chiffrée, aucune spéculation]
+[FORMAT : Pour chaque observation, explique le signe radiologique qui la justifie]
+
+**Analyse systématique :**
+- **Structures osseuses :** [Décris l'aspect des os visibles avec justification radiologique]
+- **Tissus mous :** [Décris les tissus mous avec justification radiologique]  
+- **Organes visibles :** [Décris les organes avec justification radiologique]
+- **Symétrie/Asymétrie :** [Note toute asymétrie avec justification]
+
+**Conclusion de la description :**
+- Si NORMAL : "Aucune anomalie radiologique objectivement décelée"
+- Si PATHOLOGIQUE : "Anomalies identifiées nécessitant interprétation"
 
 ---
 
 # SYNTHÈSE ET DIAGNOSTIC DIFFÉRENTIEL
+
 ## Anomalies principales
-[Liste des anomalies identifiées]
+[OBLIGATOIRE : Si AUCUNE anomalie → "Aucune anomalie radiologique identifiée"]
+[Si anomalies présentes → Liste avec justification radiologique précise pour chacune]
 
 ## Diagnostic différentiel
-[Pour l'anomalie principale, liste des diagnostics possibles]
+[SEULEMENT si anomalies identifiées :]
+[Pour chaque anomalie principale, liste les diagnostics possibles avec argumentation radiologique]
+[Si examen normal → "Non applicable - examen sans anomalie"]
 
 ## Synthèse clinico-radiologique
-[Corrélation entre signes radiologiques et renseignements cliniques, avec diagnostic le plus probable]
+[Corrélation entre :]
+- **Signes radiologiques objectifs** (avec justification)
+- **Renseignements cliniques fournis**
+- **Cohérence diagnostique** entre clinique et imagerie
+
+**Conclusion analytique :**
+[Diagnostic le plus probable avec argumentation basée sur les signes observés]
 
 ---
 
 # IMPRESSION / CONCLUSION
-1. [Premier point de conclusion]
-2. [Deuxième point de conclusion]
-3. [Diagnostic le plus probable clairement énoncé]
+
+**RÉFLEXION DIAGNOSTIQUE :**
+[Synthèse du raisonnement basé sur les signes radiologiques observés]
+
+**CONCLUSION FINALE :**
+
+**CAS NORMAL :**
+1. Examen radiologique sans anomalie décelée
+2. Structures anatomiques d'aspect normal
+3. Absence de signe pathologique objectif
+
+**CAS PATHOLOGIQUE :**
+1. [Premier diagnostic avec justification radiologique précise]
+2. [Deuxième élément diagnostique avec argumentation]
+3. [Diagnostic final le plus probable avec synthèse des arguments]
+
+**RECOMMANDATIONS :**
+[Suggestions de suivi ou examens complémentaires si nécessaire, basées sur les observations]
 
 RENSEIGNEMENTS CLINIQUES : {clinical_info}
 """
