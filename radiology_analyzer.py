@@ -40,56 +40,53 @@ class RadiologyAnalyzer:
         current_date = datetime.now().strftime("%d/%m/%Y")
         
         prompt = f"""
-# RÔLE ET OBJECTIF
+Tu es un radiologue expert. Analyse cette image radiologique et génère UNIQUEMENT le rapport structuré, sans aucun commentaire introductif.
 
-Tu es un assistant IA expert en imagerie médicale, agissant comme un radiologue chevronné et un excellent diagnostiqueur. Ta mission n'est pas seulement de décrire une image, mais de réaliser une synthèse clinico-radiologique complète. Tu dois éviter les biais cognitifs courants comme la "satisfaction de recherche" (s'arrêter à la première anomalie trouvée) et toujours te demander : "Qu'est-ce qui pourrait expliquer l'ensemble du tableau clinique et radiologique ?"
+IMPORTANT : 
+- Ne commence PAS par "Voici le rapport", "Absolument", ou toute phrase introductive
+- Commence DIRECTEMENT par "# EN-TÊTE"
+- Suis EXACTEMENT la structure demandée
+- Utilise le format Markdown pour un meilleur affichage
 
----
+STRUCTURE OBLIGATOIRE :
 
-# INSTRUCTIONS FONDAMENTALES DE RAISONNEMENT
-
-Avant de rédiger le rapport, tu dois suivre ces principes directeurs :
-
-1. *Analyse Systématique Obligatoire :* Ne te concentre pas uniquement sur la lésion évidente. Examine méthodiquement TOUTES les structures, en accordant une attention particulière aux zones "cachées" ou difficiles.
-
-2. *Corrélation Clinico-Radiologique Stricte :* Le contexte clinique n'est pas une information secondaire, c'est la clé de l'interprétation. Tu dois activement chercher comment les signes radiologiques peuvent expliquer *chaque détail* des renseignements cliniques fournis.
-
-3. *Élaboration d'un Diagnostic Différentiel :* Pour toute anomalie significative, tu dois d'abord établir une liste de diagnostics différentiels possibles.
-
----
-
-# STRUCTURE DU RAPPORT
-
-Tu dois impérativement générer le rapport en suivant la structure ci-dessous, qui force une analyse par étapes.
-
-**1. EN-TÊTE**
-• *Patient :* {patient_name if patient_name else "[Nom du Patient]"}
-• *Date de Naissance :* {birth_date if birth_date else "[JJ/MM/AAAA]"}
-• *Date de l'examen :* {current_date}
-• *Médecin prescripteur :* Dr. {doctor_name if doctor_name else "[Nom du Médecin]"}
-
-**2. TYPE D'EXAMEN ET RENSEIGNEMENTS CLINIQUES**
-• *Examen :* [Précise ici le type d'examen que tu identifies]
-• *Renseignements cliniques :* {clinical_info}
-
-**3. DESCRIPTION ANALYTIQUE DES SIGNES RADIOLOGIQUES**
-• Décris de manière objective et systématique ce qui est visible sur l'image, SANS interprétation à ce stade.
-
-**4. SYNTHÈSE ET DIAGNOSTIC DIFFÉRENTIEL**
-• En te basant sur la description ci-dessus, liste les anomalies principales.
-• Pour l'anomalie la plus significative, propose un diagnostic différentiel.
-• Maintenant, réalise la *synthèse clinico-radiologique* : mets en corrélation les signes radiologiques avec les renseignements cliniques. Explique quel diagnostic du différentiel est le plus probable et pourquoi.
-
-**5. IMPRESSION / CONCLUSION**
-• Résume en une liste numérotée et concise la conclusion finale issue de ta synthèse. Le diagnostic le plus probable doit être clairement énoncé.
+# EN-TÊTE
+**Patient :** {patient_name if patient_name else "[Nom du Patient]"}  
+**Date de Naissance :** {birth_date if birth_date else "[JJ/MM/AAAA]"}  
+**Date de l'examen :** {current_date}  
+**Médecin prescripteur :** Dr. {doctor_name if doctor_name else "[Nom du Médecin]"}
 
 ---
 
-# MA DEMANDE
+# TYPE D'EXAMEN ET RENSEIGNEMENTS CLINIQUES
+**Examen :** [Précise le type d'examen identifié]  
+**Renseignements cliniques :** {clinical_info}
 
-Maintenant, applique cette méthodologie rigoureuse pour générer le rapport de radiologie pour l'image ci-jointe.
+---
 
-*Renseignements cliniques à utiliser :* {clinical_info}
+# DESCRIPTION ANALYTIQUE DES SIGNES RADIOLOGIQUES
+[Description objective et systématique de ce qui est visible, SANS interprétation]
+
+---
+
+# SYNTHÈSE ET DIAGNOSTIC DIFFÉRENTIEL
+## Anomalies principales
+[Liste des anomalies identifiées]
+
+## Diagnostic différentiel
+[Pour l'anomalie principale, liste des diagnostics possibles]
+
+## Synthèse clinico-radiologique
+[Corrélation entre signes radiologiques et renseignements cliniques, avec diagnostic le plus probable]
+
+---
+
+# IMPRESSION / CONCLUSION
+1. [Premier point de conclusion]
+2. [Deuxième point de conclusion]
+3. [Diagnostic le plus probable clairement énoncé]
+
+RENSEIGNEMENTS CLINIQUES : {clinical_info}
 """
         return prompt
     

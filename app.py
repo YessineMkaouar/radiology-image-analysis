@@ -102,10 +102,74 @@ def analyze_radiology_image(image, clinical_info, patient_name="", birth_date=""
             pil_image, clinical_info, patient_name, birth_date, doctor_name
         )
         
-        return analysis
+        # Nettoyer le rapport pour éliminer les commentaires inutiles
+        cleaned_analysis = clean_medical_report(analysis)
+        
+        return cleaned_analysis
         
     except Exception as e:
         return f"❌ **Erreur lors de l'analyse :** {str(e)}"
+
+def clean_medical_report(report: str) -> str:
+    """
+    Nettoie le rapport médical en éliminant les commentaires introductifs
+    
+    Args:
+        report: Rapport brut généré par l'IA
+        
+    Returns:
+        Rapport nettoyé
+    """
+    # Liste des phrases introductives à supprimer
+    unwanted_phrases = [
+        "Absolument.",
+        "Voici le rapport de radiologie",
+        "Voici le rapport médical",
+        "Je vais analyser",
+        "Après analyse de l'image",
+        "Suite à l'analyse",
+        "En analysant cette image",
+        "rédigé en suivant scrupuleusement",
+        "la méthodologie et la structure demandées",
+        "Voici l'analyse",
+        "Voici donc",
+        "Comme demandé",
+        "Selon la structure demandée"
+    ]
+    
+    # Supprimer les phrases introductives
+    lines = report.split('\n')
+    cleaned_lines = []
+    skip_line = False
+    
+    for line in lines:
+        # Vérifier si la ligne contient une phrase indésirable
+        line_lower = line.lower().strip()
+        contains_unwanted = any(phrase.lower() in line_lower for phrase in unwanted_phrases)
+        
+        # Si on trouve "# EN-TÊTE" ou "# TYPE D'EXAMEN", on commence à garder les lignes
+        if line.strip().startswith("# "):
+            skip_line = False
+            
+        # Ignorer les lignes vides au début et les phrases introductives
+        if not skip_line or line.strip():
+            if not contains_unwanted and line.strip():
+                cleaned_lines.append(line)
+            elif line.strip().startswith("#"):
+                cleaned_lines.append(line)
+        
+        # Une fois qu'on a du contenu structuré, arrêter de skip
+        if line.strip().startswith("# "):
+            skip_line = False
+    
+    # Rejoindre et nettoyer
+    cleaned_report = '\n'.join(cleaned_lines)
+    
+    # Supprimer les lignes vides excessives
+    while '\n\n\n' in cleaned_report:
+        cleaned_report = cleaned_report.replace('\n\n\n', '\n\n')
+    
+    return cleaned_report.strip()
 
 def create_demo():
     """Crée l'interface Gradio pour la démonstration"""
@@ -127,6 +191,67 @@ def create_demo():
     .gr-button-primary:hover {
         background: linear-gradient(90deg, #1e3a8a, #2563eb) !important;
     }
+    
+    /* Styles pour le rapport médical */
+    .medical-report {
+        background: #fafafa !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin: 10px 0 !important;
+        font-family: 'Georgia', serif !important;
+        line-height: 1.6 !important;
+        max-height: 600px !important;
+        overflow-y: auto !important;
+    }
+    
+    .medical-report h1 {
+        color: #1e40af !important;
+        border-bottom: 2px solid #3b82f6 !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 15px !important;
+        font-size: 1.4em !important;
+    }
+    
+    .medical-report h2 {
+        color: #2563eb !important;
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+        font-size: 1.2em !important;
+    }
+    
+    .medical-report h3 {
+        color: #3b82f6 !important;
+        margin-top: 15px !important;
+        margin-bottom: 8px !important;
+        font-size: 1.1em !important;
+    }
+    
+    .medical-report p {
+        margin-bottom: 12px !important;
+        text-align: justify !important;
+    }
+    
+    .medical-report strong {
+        color: #1e40af !important;
+        font-weight: 600 !important;
+    }
+    
+    .medical-report ol, .medical-report ul {
+        margin-left: 20px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .medical-report li {
+        margin-bottom: 5px !important;
+    }
+    
+    .medical-report hr {
+        border: none !important;
+        border-top: 1px solid #d1d5db !important;
+        margin: 20px 0 !important;
+    }
+    
     .gr-textbox textarea {
         font-family: 'Courier New', monospace !important;
         font-size: 14px !important;
@@ -208,12 +333,10 @@ def create_demo():
             with gr.Column(scale=1):
                 gr.HTML("<h3>📄 Rapport d'Analyse Radiologique</h3>")
                 
-                output = gr.Textbox(
+                output = gr.Markdown(
+                    value="Le rapport d'analyse apparaîtra ici après soumission...",
                     label="Rapport Médical Généré",
-                    lines=25,
-                    max_lines=30,
-                    placeholder="Le rapport d'analyse apparaîtra ici après soumission...",
-                    show_copy_button=True
+                    elem_classes=["medical-report"]
                 )
         
         # Exemples d'utilisation
