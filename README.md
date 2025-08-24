@@ -53,7 +53,7 @@
    - Restart the application
 4. **Access the interface**
 
-   - Open your browser to: http://localhost:7860
+   - Open your browser to: http://http://127.0.0.1:7861
 
 ## 🛠️ Manual Installation
 
