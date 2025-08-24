@@ -1,9 +1,7 @@
 
-# AI Radiology Analysis Assistant / Assistant d'Analyse Radiologique IA
+# AI Radiology Analysis Assistant
 
 > An intelligent assistant for radiological image analysis using Gemini 2.5 Pro and a modern Gradio interface.
-
-*Un assistant intelligent pour l'analyse d'images radiologiques utilisant Gemini 2.5 Pro et une interface Gradio moderne.*
 
 ## 🎯 Features
 
